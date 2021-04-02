@@ -86,7 +86,7 @@ returns <- function(data) {
 data_dax <- returns(data_dax)
 data_btc <- returns(data_btc)
 data_dow <- returns(data_dow)
-data_snp <- returns(data_dow)
+data_snp <- returns(data_snp)
 
 
 #saving amended datasets
