@@ -5,7 +5,7 @@ library(dplyr)
 library(tidyr)
 library(imputeTS)
 
-setwd('path')
+setwd('D:/Academics/Academics/MEMS/Semester 3/Non-Semi PM/Research/Time varying kernel densities')
 
 
 #reading data
@@ -54,49 +54,103 @@ data_crix = data_crix[1616:2346,]
 
 
 #imputation
-
-imputed_dax <- sapply(data_dax[,2:7], na_ma, k=8)
+imputed_dax <- sapply(data_dax[,2:7], na_ma, k=4)
 data_dax[,2:7] <- imputed_dax
-
-imputed_dow <- sapply(data_dow[,2:7], na_ma, k=8)
+head(data_dax)
+imputed_dow <- sapply(data_dow[,2:7], na_ma, k=4)
 data_dow[,2:7] <- imputed_dow
 
-imputed_nq <- sapply(data_nq[,2:7], na_ma, k=8)
+imputed_nq <- sapply(data_nq[,2:7], na_ma, k=4)
 data_nq[,2:7] <- imputed_nq
 
-imputed_snp <- sapply(data_snp[,2:7], na_ma, k=8)
+imputed_snp <- sapply(data_snp[,2:7], na_ma, k=4)
 data_snp[,2:7] <- imputed_snp
 
 
 
 #computing returns
-
 data_crix$returns = 0
 for(i in 2:nrow(data_crix)) {
   data_crix$returns[i]<-(data_crix$price[i]-data_crix$price[i-1])/data_crix$price[i-1]*100
 }
+
+data_crix =data_crix %>% mutate(returns_abs=abs(returns-mean(returns)), 
+                        returns_sq = (returns - mean(returns))^2,
+                        returns_cube = (returns -mean(returns))^3)
 
 returns <- function(data) {
   data$returns <- 0
   for(i in 2:nrow(data)) {
     data$returns[i]<-(data$Adj.Close[i]-data$Adj.Close[i-1])/data$Adj.Close[i-1]*100
   }
+  data <- data %>% mutate(returns_abs = abs(returns-mean(returns)), 
+                          returns_sq = (returns - mean(returns))^2,
+                          returns_cube = (returns -mean(returns))^3)
+  
   return(data)
 }
 data_dax <- returns(data_dax)
 data_btc <- returns(data_btc)
+data_nq <- returns(data_nq)
 data_dow <- returns(data_dow)
 data_snp <- returns(data_snp)
 
 
 #saving amended datasets
-
 write.csv(data_dax,'returns_dax.csv')
 write.csv(data_btc, 'returns_btc.csv')
 write.csv(data_crix, 'returns_crix.csv')
 write.csv(data_dow, 'returns_dow.csv')
 write.csv(data_snp, 'returns_snp500.csv')
+write.csv(data_nq, 'returns_nq.csv')
 
 
+jpeg('acf_dax.jpg')
+acf_dax <- acf(data_dax$returns, main = 'ACF for daily DAX returns')
+dev.off()
 
+jpeg('acf_dow.jpg')
+acf_dow <- acf(data_dow$returns, main = 'ACF for daily DOW returns')
+dev.off()
+
+jpeg('acf_snp.jpg')
+acf_snp <- acf(data_snp$returns, main = 'ACF for daily S&P500 returns')
+dev.off()
+
+jpeg('acf_nq.jpg')
+acf_nq <- acf(data_nq$returns, main = 'ACF for daily NASDAQ returns')
+dev.off()
+
+jpeg('acf_btc.jpg')
+acf_btc <- acf(data_btc$returns, main = 'ACF for daily BTC returns')
+dev.off()
+
+jpeg('acf_crix.jpg')
+acf_crix <- acf(data_crix$returns, main = 'ACF for daily CRIX returns')
+dev.off()
+
+
+jpeg('acf2_dax.jpg')
+acf_dax <- acf(data_dax$returns_sq, main = 'ACF for daily DAX squared returns')
+dev.off()
+
+jpeg('acf2_dow.jpg')
+acf_dow <- acf(data_dow$returns_sq, main = 'ACF for daily DOW squared returns')
+dev.off()
+
+jpeg('acf2_snp.jpg')
+acf_snp <- acf(data_snp$returns_sq, main = 'ACF for daily S&P500 squared returns')
+dev.off()
+
+jpeg('acf2_nq.jpg')
+acf_nq <- acf(data_nq$returns_sq, main = 'ACF for daily NASDAQ squared  returns')
+dev.off()
+
+jpeg('acf2_btc.jpg')
+acf_btc <- acf(data_btc$returns_sq, main = 'ACF for daily BTC squared  returns')
+dev.off()
+
+jpeg('acf2_crix.jpg')
+acf_crix <- acf(data_crix$returns_sq, main = 'ACF for daily squared CRIX returns')
+dev.off()
 
