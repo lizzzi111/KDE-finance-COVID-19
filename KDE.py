@@ -22,7 +22,7 @@ def likelihood(omega, X, t):
     iterations = list(range(0,T))           # vector of i for weights
     w     = weights(iterations, t, T,omega) # generating weights
     x, y  = FFTKDE(kernel='gaussian', bw=h).fit(X, weights=w).evaluate(t) # density estimate at t
-    l     = -(1/T)*sum(np.log((y)))         #negative because changing max problem into min problem
+    l     = -(1/T)*sum(np.log((y)))         # negative because changing max problem into min problem
     return l
 
 def TKDE(ts, start='2019-01-02', until='2020-01-01', manual=False):
@@ -54,5 +54,6 @@ def TKDE(ts, start='2019-01-02', until='2020-01-01', manual=False):
                    bw='silverman').fit(ts, weights=w).evaluate(points)
     
     return {'TVKDE'    : y2,
-            'Uweights' : y1}
+            'Uweights' : y1,
+            'omega'    : omega_opt}
     
